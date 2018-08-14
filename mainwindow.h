@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStandardItemModel>
 
 namespace Ui {
 class MainWindow;
@@ -17,7 +18,10 @@ public:
 public slots:
     void showFiltered();
 private:
-    Ui::MainWindow *ui;
+    void setupFiltersTable();
+    Ui::MainWindow *ui = nullptr;
+    QStandardItemModel* m_modelLogs = nullptr;
+    QStandardItemModel* m_modelFilters = nullptr;
 };
 
 #endif // MAINWINDOW_H

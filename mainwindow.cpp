@@ -4,14 +4,11 @@
 #include <QFile>
 #include <QPlainTextEdit>
 #include <QPushButton>
-#include <QStandardItemModel>
 #include <QTableView>
 #include <QTextStream>
 
 #include <algorithm>
 
-
-QStandardItemModel* model = nullptr;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -21,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     auto ui_tableView = findChild<QTableView*>("tableView_2");
 
-    model = new QStandardItemModel(this);
+    m_modelLogs = new QStandardItemModel(this);
     ui_tableView->verticalHeader()->hide();
     ui_tableView->horizontalHeader()->hide();
 
@@ -38,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
             QList<QStandardItem *> items;
             items.append(new QStandardItem(QString::number(lineNo)));
             items.append(new QStandardItem(line));
-            model->appendRow(items);
+            m_modelLogs->appendRow(items);
             ++lineNo;
         }
         inputFile.close();
@@ -46,11 +43,12 @@ MainWindow::MainWindow(QWidget *parent) :
     auto errMsg = inputFile.errorString();
     auto err0 = inputFile.error();
 
-    ui_tableView->setModel(model);
+    ui_tableView->setModel(m_modelLogs);
 
     auto ui_button = findChild<QPushButton*>("pushButton");
     connect(ui_button, SIGNAL(clicked()), this, SLOT(showFiltered()));
 
+    setupFiltersTable();
 }
 
 MainWindow::~MainWindow()
@@ -61,26 +59,47 @@ MainWindow::~MainWindow()
 void MainWindow::showFiltered()
 {
     auto ui_tableView = findChild<QTableView*>("tableView_2");
-    auto ui_plainTextEdit = findChild<QPlainTextEdit*>("plainTextEdit");
 
-    auto search = ui_plainTextEdit->toPlainText();
-    for (int i = 0; i < model->rowCount(); ++i)
+    for (int i = 0; i < m_modelLogs->rowCount(); ++i)
     {
-        auto text = model->item(i, 1)->text();
-        if (search.isEmpty())
-        {
-            ui_tableView->setRowHidden(i, false);
-            continue;
-        }
-
-        if (text.contains(search))
-        {
-            ui_tableView->setRowHidden(i, false);
-        }
-        else
-        {
-            ui_tableView->setRowHidden(i, true);
-        }
+        ui_tableView->setRowHidden(i, true);
     }
 
+    for (int i = 0; i < m_modelLogs->rowCount(); ++i)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            auto search = m_modelFilters->item(j)->text();
+            auto text = m_modelLogs->item(i, 1)->text();
+
+            if (text.contains(search))
+            {
+                ui_tableView->setRowHidden(i, false);
+                auto item = m_modelLogs->item(i, 1);
+                if (j == 0)
+                {
+                    item->setBackground(QBrush(Qt::red));
+                    item->setForeground(QBrush(Qt::yellow));
+                }
+                else
+                {
+                    item->setBackground(QBrush(Qt::gray));
+                }
+            }
+        }
+    }
+}
+
+void MainWindow::setupFiltersTable()
+{
+    m_modelFilters = new QStandardItemModel(this);
+    QList<QStandardItem *> items;
+    items.append(new QStandardItem("test"));
+    QList<QStandardItem *> items2;
+    items2.append(new QStandardItem("test2"));
+    m_modelFilters->appendRow(items);
+    m_modelFilters->appendRow(items2);
+
+    auto tableView = findChild<QTableView*>("tableView");
+    tableView->setModel(m_modelFilters);
 }
