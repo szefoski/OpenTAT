@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent) :
     auto ui_tableView = findChild<QTableView*>("tableView_2");
 
     model = new QStandardItemModel(this);
+    ui_tableView->verticalHeader()->hide();
+    ui_tableView->horizontalHeader()->hide();
 
     QFile inputFile("/home/daniel/Downloads/logs.txt");
     QFileDevice::FileError err = QFileDevice::NoError;
@@ -29,12 +31,15 @@ MainWindow::MainWindow(QWidget *parent) :
     if (inputFile.open(QIODevice::ReadOnly))
     {
         QTextStream in(&inputFile);
+        int lineNo = 1;
         while (!in.atEnd())
         {
             QString line = in.readLine();
             QList<QStandardItem *> items;
+            items.append(new QStandardItem(QString::number(lineNo)));
             items.append(new QStandardItem(line));
             model->appendRow(items);
+            ++lineNo;
         }
         inputFile.close();
     }
@@ -61,7 +66,7 @@ void MainWindow::showFiltered()
     auto search = ui_plainTextEdit->toPlainText();
     for (int i = 0; i < model->rowCount(); ++i)
     {
-        auto text = model->item(i)->text();
+        auto text = model->item(i, 1)->text();
         if (search.isEmpty())
         {
             ui_tableView->setRowHidden(i, false);
@@ -77,4 +82,5 @@ void MainWindow::showFiltered()
             ui_tableView->setRowHidden(i, true);
         }
     }
+
 }
