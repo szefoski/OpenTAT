@@ -17,6 +17,16 @@ public:
     ~MainWindow();
 public slots:
     void showFiltered();
+    void selectedFilter(const QModelIndex&);
+private slots:
+    void on_tableView_clicked(const QModelIndex &index);
+
+    void on_tableView_entered(const QModelIndex &index);
+
+    void on_tableView_viewportEntered();
+
+    void on_tableView_doubleClicked(const QModelIndex &index);
+
 private:
     void setupFiltersTable();
     Ui::MainWindow *ui = nullptr;

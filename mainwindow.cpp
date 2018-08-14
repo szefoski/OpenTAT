@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QColorDialog>
+#include <QtDebug>
 #include <QFile>
 #include <QPlainTextEdit>
 #include <QPushButton>
@@ -49,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui_button, SIGNAL(clicked()), this, SLOT(showFiltered()));
 
     setupFiltersTable();
+
+
 }
 
 MainWindow::~MainWindow()
@@ -59,6 +63,15 @@ MainWindow::~MainWindow()
 void MainWindow::showFiltered()
 {
     auto ui_tableView = findChild<QTableView*>("tableView_2");
+    auto ui_tableFilters = findChild<QTableView*>("tableView");
+
+    const QColor hlClr = Qt::red; // highlight color to set
+    const QColor txtClr = Qt::white; // highlighted text color to set
+
+    QPalette p = palette();
+    p.setColor(QPalette::Highlight, hlClr);
+    p.setColor(QPalette::HighlightedText, txtClr);
+    ui_tableFilters->setPalette(p);
 
     for (int i = 0; i < m_modelLogs->rowCount(); ++i)
     {
@@ -67,7 +80,7 @@ void MainWindow::showFiltered()
 
     for (int i = 0; i < m_modelLogs->rowCount(); ++i)
     {
-        for (int j = 0; j < 2; j++)
+        for (int j = 0; j < m_modelFilters->rowCount(); j++)
         {
             auto search = m_modelFilters->item(j)->text();
             auto text = m_modelLogs->item(i, 1)->text();
@@ -75,31 +88,76 @@ void MainWindow::showFiltered()
             if (text.contains(search))
             {
                 ui_tableView->setRowHidden(i, false);
-                auto item = m_modelLogs->item(i, 1);
-                if (j == 0)
-                {
-                    item->setBackground(QBrush(Qt::red));
-                    item->setForeground(QBrush(Qt::yellow));
-                }
-                else
-                {
-                    item->setBackground(QBrush(Qt::gray));
-                }
+                auto itemLog = m_modelLogs->item(i, 1);
+                auto itemBg = m_modelFilters->item(j, 1);
+
+                itemLog->setBackground(itemBg->background());
+                itemLog->setForeground(QBrush(Qt::yellow));
+                break;
             }
         }
     }
 }
 
+void MainWindow::selectedFilter(const QModelIndex &)
+{
+
+}
+
 void MainWindow::setupFiltersTable()
 {
     m_modelFilters = new QStandardItemModel(this);
-    QList<QStandardItem *> items;
-    items.append(new QStandardItem("test"));
-    QList<QStandardItem *> items2;
-    items2.append(new QStandardItem("test2"));
-    m_modelFilters->appendRow(items);
-    m_modelFilters->appendRow(items2);
+    for (int i = 0; i < 5; ++i)
+    {
+        QList<QStandardItem *> items;
+
+        auto itemFilter = new QStandardItem();
+        itemFilter->setSelectable(false);
+        items.append(itemFilter);
+
+        auto itemColor = new QStandardItem();
+        itemColor->setSelectable(false);
+        itemColor->setEditable(false);
+        items.append(itemColor);
+
+        m_modelFilters->appendRow(items);
+    }
 
     auto tableView = findChild<QTableView*>("tableView");
     tableView->setModel(m_modelFilters);
+}
+
+void MainWindow::on_tableView_clicked(const QModelIndex &index)
+{
+}
+
+void MainWindow::on_tableView_entered(const QModelIndex &index)
+{
+   int a = 0;
+}
+
+void MainWindow::on_tableView_viewportEntered()
+{
+   int a = 0;
+   ++a;
+   a = a;
+}
+
+void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
+{
+    if (index.column() == 1)
+    {
+        QFlags<QColorDialog::ColorDialogOption> opt1;
+        opt1.setFlag(QColorDialog::DontUseNativeDialog, true);
+        opt1.setFlag(QColorDialog::ShowAlphaChannel);
+        QColor color = QColorDialog::getColor(Qt::darkGreen, this , "Set Color", opt1);
+
+        if( color.isValid() )
+        {
+            qDebug() << "Color Choosen : " << color.name();
+        }
+
+        m_modelFilters->item(index.row(), index.column())->setBackground(color);
+        showFiltered();
+    }
 }
