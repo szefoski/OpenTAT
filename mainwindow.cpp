@@ -11,6 +11,8 @@
 
 #include <algorithm>
 
+const int FilterTableColumnBg = 1;
+const int FilterTableColumnFg = 2;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -35,7 +37,9 @@ MainWindow::MainWindow(QWidget *parent) :
         {
             QString line = in.readLine();
             QList<QStandardItem *> items;
-            items.append(new QStandardItem(QString::number(lineNo)));
+            auto lineNoItem = new QStandardItem(QString::number(lineNo));
+            lineNoItem->setTextAlignment(Qt::AlignmentFlag::AlignRight);
+            items.append(lineNoItem);
             items.append(new QStandardItem(line));
             m_modelLogs->appendRow(items);
             ++lineNo;
@@ -49,6 +53,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     auto ui_button = findChild<QPushButton*>("pushButton");
     connect(ui_button, SIGNAL(clicked()), this, SLOT(showFiltered()));
+
+    ui_tableView->resizeColumnToContents(0);
 
     setupFiltersTable();
 
@@ -89,10 +95,11 @@ void MainWindow::showFiltered()
             {
                 ui_tableView->setRowHidden(i, false);
                 auto itemLog = m_modelLogs->item(i, 1);
-                auto itemBg = m_modelFilters->item(j, 1);
+                auto itemBg = m_modelFilters->item(j, FilterTableColumnBg);
+                auto itemFg = m_modelFilters->item(j, FilterTableColumnFg);
 
                 itemLog->setBackground(itemBg->background());
-                itemLog->setForeground(QBrush(Qt::yellow));
+                itemLog->setForeground(itemFg->background());
                 break;
             }
         }
@@ -107,6 +114,10 @@ void MainWindow::selectedFilter(const QModelIndex &)
 void MainWindow::setupFiltersTable()
 {
     m_modelFilters = new QStandardItemModel(this);
+    m_modelFilters->setColumnCount(3);
+
+    QStringList headers = {};
+    m_modelFilters->setHorizontalHeaderLabels({"Filter", "BG Color", "Font Color"});
     for (int i = 0; i < 5; ++i)
     {
         QList<QStandardItem *> items;
@@ -115,10 +126,15 @@ void MainWindow::setupFiltersTable()
         itemFilter->setSelectable(false);
         items.append(itemFilter);
 
-        auto itemColor = new QStandardItem();
-        itemColor->setSelectable(false);
-        itemColor->setEditable(false);
-        items.append(itemColor);
+        auto itemColorBg = new QStandardItem();
+        itemColorBg->setSelectable(false);
+        itemColorBg->setEditable(false);
+        items.append(itemColorBg);
+
+        auto itemColorFg = new QStandardItem();
+        itemColorFg->setSelectable(false);
+        itemColorFg->setEditable(false);
+        items.append(itemColorFg);
 
         m_modelFilters->appendRow(items);
     }
@@ -145,7 +161,7 @@ void MainWindow::on_tableView_viewportEntered()
 
 void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 {
-    if (index.column() == 1)
+    if (index.column() == FilterTableColumnBg || index.column() == FilterTableColumnFg)
     {
         QFlags<QColorDialog::ColorDialogOption> opt1;
         opt1.setFlag(QColorDialog::DontUseNativeDialog, true);
@@ -157,7 +173,7 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
             qDebug() << "Color Choosen : " << color.name();
         }
 
-        m_modelFilters->item(index.row(), index.column())->setBackground(color);
+        m_modelFilters->itemFromIndex(index)->setBackground(color);
         showFiltered();
     }
 }
