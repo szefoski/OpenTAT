@@ -16,17 +16,12 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 public slots:
-    void showFiltered();
+    void filterLogs();
     void selectedFilter(const QModelIndex&);
+protected:
+    void applyFilter(const QModelIndex &index);
 private slots:
-    void on_tableView_clicked(const QModelIndex &index);
-
-    void on_tableView_entered(const QModelIndex &index);
-
-    void on_tableView_viewportEntered();
-
-    void on_tableView_doubleClicked(const QModelIndex &index);
-
+    void on_tableFilters_doubleClicked(const QModelIndex &index);
 private:
     void setupFiltersTable();
     Ui::MainWindow *ui = nullptr;
