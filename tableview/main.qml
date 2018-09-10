@@ -108,6 +108,10 @@ ApplicationWindow {
                             color: "#e47a7a";
                         }
                         GradientStop {
+                            position: 0.50;
+                            color: "#e47a7a";
+                        }
+                        GradientStop {
                             position: 1.00;
                             color: "#ffffff";
                         }
