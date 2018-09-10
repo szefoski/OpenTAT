@@ -53,6 +53,9 @@ import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
 import org.qtproject.example 1.0
 
+//https://wiki.qt.io/How_to_Use_a_Custom_Class_in_C%2B%2B_Model_and_QML_View
+//https://www.google.pl/search?q=c%2B%2B+model+qml&oq=c%2B%2B+model+qml&aqs=chrome..69i57j0l4.12096j0j7&sourceid=chrome&ie=UTF-8
+
 ApplicationWindow {
     id: window
     visible: true
@@ -102,20 +105,21 @@ ApplicationWindow {
                          var col1 = styleData.column === 0 ? "#ff0" : "#f0f"
                          return styleData.selected ? col1 : "#0f0"
                     }
-                    gradient: Gradient {
+                    /*gradient: Gradient {
                         GradientStop {
                             position: 0.00;
-                            color: "#e47a7a";
+                            color: styleData.selected ? "yellow" : "green";
                         }
                         GradientStop {
                             position: 0.50;
-                            color: "#e47a7a";
+                            color: styleData.selected ? "yellow" : "green";
+
                         }
                         GradientStop {
                             position: 1.00;
                             color: "#ffffff";
                         }
-                    }
+                    }*/
                     Text {
                         text: styleData.value
                         color: styleData.selected ? "blue" : "green"
@@ -139,8 +143,8 @@ ApplicationWindow {
             resizable: false
             width: tableView.viewport.width / 3
         }
-
-        model: SortFilterProxyModel {
+        model: people.model
+        /*model: SortFilterProxyModel {
             id: proxyModel
             source: sourceModel.count > 0 ? sourceModel : null
 
@@ -151,9 +155,11 @@ ApplicationWindow {
             filterString: "*" + searchBox.text + "*"
             filterSyntax: SortFilterProxyModel.Wildcard
             filterCaseSensitivity: Qt.CaseInsensitive
-        }
+        }*/
 
-        ListModel {
+
+
+        /*ListModel {
             id: sourceModel
             ListElement {
                 title: "Moby-Dick"
@@ -231,6 +237,6 @@ ApplicationWindow {
                 title: "Herbert West—Reanimator"
                 author: "H. P. Lovecraft"
             }
-        }
+        }*/
     }
 }

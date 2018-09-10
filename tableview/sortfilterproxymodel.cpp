@@ -1,4 +1,5 @@
 #include "sortfilterproxymodel.h"
+#include <QStandardItemModel>
 #include <QtDebug>
 #include <QtQml>
 
@@ -6,6 +7,10 @@ SortFilterProxyModel::SortFilterProxyModel(QObject *parent) : QSortFilterProxyMo
 {
     connect(this, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SIGNAL(countChanged()));
     connect(this, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SIGNAL(countChanged()));
+
+    m_model = new QStandardItemModel(this);
+    m_model->insertColumn(0);
+    fillDummyData();
 }
 
 int SortFilterProxyModel::count() const
