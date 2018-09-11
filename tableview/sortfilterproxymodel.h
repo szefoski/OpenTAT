@@ -103,6 +103,7 @@ private:
             addPerson(QStringLiteral("Albert"),QStringLiteral("Einstein"));
             addPerson(QStringLiteral("Robert"),QStringLiteral("Oppenheimer"));
             addPerson(QStringLiteral("Enrico"),QStringLiteral("Fermi"));
+            addPerson(QStringLiteral("Szef"),QStringLiteral("Szefoski"));
         }
 
     bool m_complete;

@@ -126,7 +126,13 @@ ApplicationWindow {
                     }
                 }
 
-        TableViewColumn {
+        TableViewColumn {title: "1"; role: "one"; width: 70 }
+            TableViewColumn {title: "2"; role: "two"; width: 70   }
+            TableViewColumn {title: "3"; role: "three"; width: 70 }
+
+            model: theModel
+
+        /*TableViewColumn {
             id: titleColumn
             title: "Title"
             role: "title"

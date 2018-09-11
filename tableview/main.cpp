@@ -4,6 +4,8 @@
 
 #include "sortfilterproxymodel.h"
 
+#include "mymodel.h"
+
 int main(int argc, char *argv[])
 {
 
@@ -14,8 +16,13 @@ int main(int argc, char *argv[])
      qmlRegisterType<SortFilterProxyModel>("org.qtproject.example", 1, 0, "SortFilterProxyModel");
 
     QQmlApplicationEngine engine;
+
+    MyModel model;
+    engine.rootContext()->setContextProperty("theModel", &model);
+
     SortFilterProxyModel people;
     engine.rootContext()->setContextProperty("people", &people);
+
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;
