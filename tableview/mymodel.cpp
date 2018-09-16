@@ -2,10 +2,7 @@
 
 MyModel::MyModel() : QAbstractTableModel(nullptr)
 {
-    m_the_data << SimpleData{"Alpha", 10, 100.0}
-               << SimpleData{"Beta", 20, 200.0}
-               << SimpleData{"Gamma", 30, 300.0}
-               << SimpleData{"Delta", 40, 400.0};
+    loadFromFile("/home/daniel/Downloads/logs1.txt");
 }
 
 int MyModel::rowCount(const QModelIndex &parent) const
@@ -38,26 +35,76 @@ QVariant MyModel::data(const QModelIndex &index, int role) const
      qDebug() << "MyModel::data: " << index.column() << "; " << index.row();
     switch(role)
     {
-        case OneRole:
-            return m_the_data[index.row()].m_one;
-        case TwoRole:
-            return m_the_data[index.row()].m_two;
-        case ThreeRole:
-            return m_the_data[index.row()].m_three;;
+        case LogNoRole:
+            return m_the_data[index.row()].m_logNumber;
+        case LogTextRole:
+            return m_the_data[index.row()].m_logText;
         default:
             qDebug() << "Not supposed to happen";
             return QVariant();
     }
 }
 
+bool MyModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+   qDebug() << "setData() called with:" << value;
+   if (!hasIndex(index.row(), index.column(), index.parent()) || !value.isValid())
+            return false;
+
+    switch(role)
+    {
+        case LogNoRole:
+            m_the_data[index.row()].m_logNumber = value.toInt();
+        break;
+        case LogTextRole:
+            m_the_data[index.row()].m_logText = value.toString();
+        break;
+    }
+
+    emit dataChanged(index, index, { role } );
+
+    return true;
+}
+
+QString MyModel::getLongestLog()
+{
+   return m_longestLog;
+}
+
 QHash<int, QByteArray> MyModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-        roles[OneRole] = "one";
-        roles[TwoRole] = "two";
-        roles[ThreeRole] = "three";
+        roles[LogNoRole] = "line";
+        roles[LogTextRole] = "text";
         return roles;
 
+}
+
+void MyModel::loadFromFile(const QString &filePath)
+{
+    int longestLog = 0;
+    int longestLogIndex = 0;
+    QFile inputFile(filePath);
+    QFileDevice::FileError err = QFileDevice::NoError;
+    const bool exists = inputFile.exists();
+    if (inputFile.open(QIODevice::ReadOnly))
+    {
+        QTextStream in(&inputFile);
+        int lineNo = 1;
+        while (!in.atEnd())
+        {
+            QString line = in.readLine();
+            if (line.size() > longestLog)
+            {
+                longestLog = line.size();
+                longestLogIndex = lineNo - 1;
+            }
+            m_the_data << SimpleData{lineNo, line};
+            ++lineNo;
+        }
+        inputFile.close();
+        m_longestLog = m_the_data[longestLogIndex].m_logText;
+    }
 }
 
 void MyModel::theDataChanged()

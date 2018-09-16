@@ -9,9 +9,8 @@
 
 struct SimpleData
 {
-    QString m_one;
-    qint32 m_two;
-    qreal m_three;
+    qint32 m_logNumber;
+    QString m_logText;
 };
 
 class MyModel : public QAbstractTableModel
@@ -22,22 +21,24 @@ public:
     int rowCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
+    bool setData(const QModelIndex & index, const QVariant &value, int role = Qt::EditRole) Q_DECL_OVERRIDE;
 
     QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
 
     enum Role {
-        OneRole=Qt::UserRole,
-        TwoRole,
-        ThreeRole
+        LogNoRole=Qt::UserRole,
+        LogTextRole,
     };
+    void loadFromFile(const QString &filePath);
 signals:
 
 public slots:
     void theDataChanged();
+    QString getLongestLog();
 
 private:
    QList<SimpleData> m_the_data;
-
+   QString m_longestLog;
 };
 
 
