@@ -7,6 +7,7 @@ import QtQuick.Dialogs 1.3
 import QtQuick.Controls.Styles 1.2
 
 //http://doc.qt.io/qt-5/qml-qtquick-item.html#childrenRect.height-prop
+//https://www.qtcentre.org/threads/65419-Custom-editable-TableView
 
 ApplicationWindow {
     id: window
@@ -92,6 +93,71 @@ ApplicationWindow {
 
         }
 
+        ControlsOld.TableView {
+            id: table
+            Layout.maximumHeight: 200
+            Layout.minimumHeight: 200
+            Layout.preferredHeight: 200
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            signal checked(int row, int col, bool isChecked)
+            ControlsOld.TableViewColumn { role: "col1"; title: "Columnt1"; width: 100 }
+            ControlsOld.TableViewColumn { role: "col2"; title: "Columnt2"; width: 100 }
+            ControlsOld.TableViewColumn { role: "col3"; title: "Columnt3"; width: 100
+
+
+             delegate: SpinBox{
+                    id: propValue
+                    value: styleData.value
+                    //minimumValue: 8
+                    //maximumValue: 10
+                    //selectByMouse: false // <- this is not working still editable
+
+                    property int lastValue: 12
+
+                    onValueChanged: {
+                        var newValue = propValue.value + propertyModel.get(propertyTable.currentRow).bonus
+                        var delta = propValue.value - lastValue
+                        secondPage.propValueSum += delta
+                        lastValue = propValue.value
+                        propertyModel.setProperty(propertyTable.currentRow, "value", propValue.value)
+                        propertyModel.setProperty(propertyTable.currentRow, "current", newValue)
+                    }
+                }
+
+
+            }
+            model: ListModel {
+                ListElement { col1: true; col2: false; col3: false }
+                ListElement { col1: false; col2: false; col3: true }
+                ListElement { col1: true; col2: false; col3: true }
+            }
+            rowDelegate: Rectangle
+            {
+                height: 100
+            }
+
+            itemDelegate: Item {
+                CheckBox {
+                    anchors.centerIn: parent
+                    checked: styleData.value
+                    onClicked: {
+                        table.selection.clear();
+                        table.selection.select(styleData.row);
+                        table.currentRow = styleData.row;
+                        table.checked(styleData.row, styleData.column, checked);
+                    }
+                }
+
+                Rectangle {
+                        width: 40
+                        height: 40
+                        color: "#ff0"
+                    }
+            }
+            onChecked: console.log(row, col, isChecked);
+        }
+        /*
         ListView {
             id: listView
             width: 110
@@ -144,13 +210,23 @@ ApplicationWindow {
                         anchors.verticalCenter: parent.verticalCenter
                     }
                 }
+                CheckBox {
+                anchors.centerIn: parent
+                checked: styleData.value
+                onClicked: {
+                    table.selection.clear();
+                    table.selection.select(styleData.row);
+                    table.currentRow = styleData.row;
+                    table.checked(styleData.row, styleData.column, checked);
+                }
+            }
             }
             ScrollBar.vertical: ScrollBar {
                 policy: ScrollBar.AlwaysOn
             }
         }
 
-
+*/
     }
 
     FileDialog {
