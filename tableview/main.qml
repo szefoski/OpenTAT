@@ -6,6 +6,8 @@ import QtQuick.Layouts 1.3
 import QtQuick.Dialogs 1.3
 import QtQuick.Controls.Styles 1.2
 
+//http://doc.qt.io/qt-5/qml-qtquick-item.html#childrenRect.height-prop
+
 ApplicationWindow {
     id: window
     width: 800
@@ -22,7 +24,7 @@ ApplicationWindow {
                 onClicked:
                 {
                     tableView.model = theModel;
-                    fileDialog.open();
+                    //fileDialog.open();
                     var longestLog = theModel.getLongestLog();
                     var lastSelectedRow = tableView.currentRow;
                     var lastRow = theModel.rowCount() - 1;
@@ -56,17 +58,18 @@ ApplicationWindow {
                 color: {
                     if (styleData.column === 0)
                     {
-                       return styleData.selected ? "#ff0" : "#aaa"
+                        return styleData.selected ? "#ff0" : "#aaa"
                     }
                     return "#fff"
                 }
                 Text {
+                    //        width: parent.width
+                    //        wrapMode: Text.WordWrap
                     text: styleData.value
                     font.family: "Inconsolata"
                     color: styleData.selected ? "black" : "black"
                 }
                 implicitWidth: childrenRect.width;
-                width: 1000;
             }
 
             ControlsOld.TableViewColumn {
@@ -89,31 +92,61 @@ ApplicationWindow {
 
         }
 
-        Rectangle {
-            id: rectangle
-            width: 200
-            height: 200
-            color: "#19b329"
-            Layout.maximumHeight: 50
-            Layout.minimumHeight: 50
-            Layout.preferredHeight: 50
+        ListView {
+            id: listView
+            width: 110
+            height: 160
+            clip: true
+            orientation: ListView.Vertical
+            keyNavigationWraps: true
+            Layout.maximumHeight: 100
+            Layout.minimumHeight: 100
+            Layout.preferredHeight: 100
             Layout.fillHeight: true
             Layout.fillWidth: true
-
-            Button {
-                id: button2
-                x: 246
-                y: 8
-                text: qsTr("Button")
-
-                onClicked:
-                {
-                    //fileDialog.open();
-                    var listview = authorColumn.__view.__listView;
-                    var row = tableView.currentRow;
-                    tableView.currentRow = 0;
-                    var ads = 0;
+            model: ListModel {
+                ListElement {
+                    name: "Grey"
+                    colorCode: "grey"
                 }
+
+                ListElement {
+                    name: "Red"
+                    colorCode: "red"
+                }
+
+                ListElement {
+                    name: "Blue"
+                    colorCode: "blue"
+                }
+
+                ListElement {
+                    name: "Green"
+                    colorCode: "green"
+                }
+            }
+            delegate: Item {
+                x: 5
+                width: 80
+                height: 40
+                Row {
+                    id: row1
+                    spacing: 10
+                    Rectangle {
+                        width: 40
+                        height: 40
+                        color: colorCode
+                    }
+
+                    Text {
+                        text: name
+                        font.bold: true
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+            }
+            ScrollBar.vertical: ScrollBar {
+                policy: ScrollBar.AlwaysOn
             }
         }
 
@@ -136,5 +169,6 @@ ApplicationWindow {
         }
         //Component.onCompleted: visible = true
     }
+
 
 }
