@@ -8,6 +8,8 @@ import QtQuick.Controls.Styles 1.2
 
 //http://doc.qt.io/qt-5/qml-qtquick-item.html#childrenRect.height-prop
 //https://www.qtcentre.org/threads/65419-Custom-editable-TableView
+//https://stackoverflow.com/questions/36458795/qml-retrieve-value-of-a-spinbox-used-in-a-tableview-cell
+//https://stackoverflow.com/questions/39287426/how-to-set-qml-tableviewcolumn-height
 
 ApplicationWindow {
     id: window
@@ -54,6 +56,7 @@ ApplicationWindow {
             sortIndicatorVisible: true
             selectionMode: ControlsOld.SelectionMode.ExtendedSelection
 
+
             itemDelegate: Rectangle {
                 //            color: "transparent"
                 color: {
@@ -68,6 +71,7 @@ ApplicationWindow {
                     //        wrapMode: Text.WordWrap
                     text: styleData.value
                     font.family: "Inconsolata"
+                    //font.pointSize: styleData.selected ? 15 : 10
                     color: styleData.selected ? "black" : "black"
                 }
                 implicitWidth: childrenRect.width;
@@ -90,7 +94,6 @@ ApplicationWindow {
                 resizable: false
                 //width:
             }
-
         }
 
         ControlsOld.TableView {
@@ -101,60 +104,117 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             signal checked(int row, int col, bool isChecked)
-            ControlsOld.TableViewColumn { role: "col1"; title: "Columnt1"; width: 100 }
-            ControlsOld.TableViewColumn { role: "col2"; title: "Columnt2"; width: 100 }
-            ControlsOld.TableViewColumn { role: "col3"; title: "Columnt3"; width: 100
 
+            ControlsOld.TableViewColumn {
+                role: "col1";
+                title: "Active";
+                width: 100
 
-             delegate: SpinBox{
-                    id: propValue
-                    value: styleData.value
-                    //minimumValue: 8
-                    //maximumValue: 10
-                    //selectByMouse: false // <- this is not working still editable
+                delegate: Item {
+                    Rectangle {
+                        width: parent.width
+                        height: parent.height
+                        color: "orange"
+                    }
 
-                    property int lastValue: 12
-
-                    onValueChanged: {
-                        var newValue = propValue.value + propertyModel.get(propertyTable.currentRow).bonus
-                        var delta = propValue.value - lastValue
-                        secondPage.propValueSum += delta
-                        lastValue = propValue.value
-                        propertyModel.setProperty(propertyTable.currentRow, "value", propValue.value)
-                        propertyModel.setProperty(propertyTable.currentRow, "current", newValue)
+                    CheckBox {
+                        anchors.centerIn: parent
+                        checked: styleData.value
+                        onClicked: {
+                            table.selection.clear();
+                            table.selection.select(styleData.row);
+                            table.currentRow = styleData.row;
+                            table.checked(styleData.row, styleData.column, checked);
+                        }
                     }
                 }
-
-
             }
+
+            ControlsOld.TableViewColumn {
+                role: "fontColor"
+                title: "Font Color"
+                width: 70
+
+                delegate: Item {
+                    Rectangle {
+                        width: parent.width
+                        height: parent.height
+                        color: "blue"
+                    }
+                }
+            }
+
+            ControlsOld.TableViewColumn {
+                role: "bgColor"
+                title: "BG Color"
+                width: 70
+
+                delegate: ItemDelegate {
+                    Rectangle {
+                        id: ttt1
+                        width: parent.width
+                        height: parent.height
+                        color: "yellow"
+
+                    }
+                    onClicked: {
+                        ttt1.color = "black"
+                    }
+                }
+            }
+
+            ControlsOld.TableViewColumn {
+                role: "col2"
+                title: "Pattern"
+                width: 100
+
+                delegate: Item {
+                    Rectangle {
+                        width: parent.width
+                        height: parent.height
+                        color: "blue"
+                    }
+                }
+            }
+
+            ControlsOld.TableViewColumn {
+                role: "col3"
+                title: "Columnt3"
+
+                delegate: Item {
+                    SpinBox{
+                        id: propValue
+                        value: styleData.value
+                        //minimumValue: 8
+                        //maximumValue: 10
+                        //selectByMouse: false // <- this is not working still editable
+
+                        property int lastValue: 12
+
+                        onValueChanged: {
+                            var newValue = propValue.value + propertyModel.get(propertyTable.currentRow).bonus
+                            var delta = propValue.value - lastValue
+                            secondPage.propValueSum += delta
+                            lastValue = propValue.value
+                            propertyModel.setProperty(propertyTable.currentRow, "value", propValue.value)
+                            propertyModel.setProperty(propertyTable.currentRow, "current", newValue)
+                        }
+                    }
+                }
+            }
+
             model: ListModel {
-                ListElement { col1: true; col2: false; col3: false }
+                ListElement { col1: true; col2: false; col3: 4 }
                 ListElement { col1: false; col2: false; col3: true }
                 ListElement { col1: true; col2: false; col3: true }
             }
+
             rowDelegate: Rectangle
             {
                 height: 100
             }
 
-            itemDelegate: Item {
-                CheckBox {
-                    anchors.centerIn: parent
-                    checked: styleData.value
-                    onClicked: {
-                        table.selection.clear();
-                        table.selection.select(styleData.row);
-                        table.currentRow = styleData.row;
-                        table.checked(styleData.row, styleData.column, checked);
-                    }
-                }
 
-                Rectangle {
-                        width: 40
-                        height: 40
-                        color: "#ff0"
-                    }
-            }
             onChecked: console.log(row, col, isChecked);
         }
         /*
