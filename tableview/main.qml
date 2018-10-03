@@ -17,6 +17,11 @@ ApplicationWindow {
     height: 600
     visible: true
     title: "Table View Example"
+     property var colors1: ["black"];
+
+    property variant items: ["green", "orange", "blue", "yellow", "red"]
+    property variant attributes: { 'color': 'red', 'width': 100 }
+
 
     header: ToolBar
     {
@@ -26,6 +31,7 @@ ApplicationWindow {
                 text: "Open"
                 onClicked:
                 {
+                    //window.colors.push("black")
                     tableView.model = theModel;
                     //fileDialog.open();
                     var longestLog = theModel.getLongestLog();
@@ -40,7 +46,26 @@ ApplicationWindow {
                     tableView.currentRow = lastSelectedRow;
                 }
             }
+
+            ToolButton {
+                text: "Refresh"
+                onClicked:
+                {
+
+                }
+            }
         }
+    }
+
+    property string ccc: "pink"
+    property int count1: 0
+
+    function getColor(patternId)
+    {
+        //window.colors1.
+        console.log("Daniel", window.colors1.length, window.colors1[0]);
+        return items[patternId]
+        //return window.colors[0]
     }
 
     ColumnLayout {
@@ -58,13 +83,16 @@ ApplicationWindow {
 
 
             itemDelegate: Rectangle {
+                id: rowLog
+                property int patternId: 0
                 //            color: "transparent"
                 color: {
                     if (styleData.column === 0)
                     {
                         return styleData.selected ? "#ff0" : "#aaa"
                     }
-                    return "#fff"
+
+                    return getColor(patternId)
                 }
                 Text {
                     //        width: parent.width
@@ -74,6 +102,12 @@ ApplicationWindow {
                     //font.pointSize: styleData.selected ? 15 : 10
                     color: styleData.selected ? "black" : "black"
                 }
+
+                Component.onCompleted: {
+                    count1 = (count1 + 1) % items.length;
+                    patternId = count1
+                }
+
                 implicitWidth: childrenRect.width;
             }
 
@@ -159,20 +193,32 @@ ApplicationWindow {
                     }
                     onClicked: {
                         ttt1.color = "black"
+                        window.ccc = "green"
                     }
                 }
             }
 
             ControlsOld.TableViewColumn {
-                role: "col2"
+                role: "pattern"
                 title: "Pattern"
-                width: 100
+                width: 400
 
                 delegate: Item {
                     Rectangle {
                         width: parent.width
                         height: parent.height
-                        color: "blue"
+                        color: "white"
+
+                    }
+                    Text {
+                        anchors.fill: parent
+
+                        //        width: parent.width
+                        //        wrapMode: Text.WordWrap
+                        text: styleData.value
+                        font.family: "Inconsolata"
+                        //font.pointSize: styleData.selected ? 15 : 10
+                        color: styleData.selected ? "black" : "black"
                     }
                 }
             }
@@ -204,8 +250,8 @@ ApplicationWindow {
             }
 
             model: ListModel {
-                ListElement { col1: true; col2: false; col3: 4 }
-                ListElement { col1: false; col2: false; col3: true }
+                ListElement { col1: true; col2: false; col3: 4; pattern: "Test" }
+                ListElement { col1: false; col2: false; col3: true; pattern: "Test2" }
                 ListElement { col1: true; col2: false; col3: true }
             }
 
