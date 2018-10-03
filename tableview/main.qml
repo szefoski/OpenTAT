@@ -17,7 +17,7 @@ ApplicationWindow {
     height: 600
     visible: true
     title: "Table View Example"
-     property var colors1: ["black"];
+    property var colors1: ["black"];
 
     property variant items: ["green", "orange", "blue", "yellow", "red"]
     property variant attributes: { 'color': 'red', 'width': 100 }
@@ -139,8 +139,10 @@ ApplicationWindow {
             Layout.fillHeight: true
             signal checked(int row, int col, bool isChecked)
 
+
+
             ControlsOld.TableViewColumn {
-                role: "col1";
+                role: "Role_Active";
                 title: "Active";
                 width: 100
 
@@ -165,7 +167,7 @@ ApplicationWindow {
             }
 
             ControlsOld.TableViewColumn {
-                role: "fontColor"
+                role: "Role_FontColor"
                 title: "Font Color"
                 width: 70
 
@@ -173,13 +175,13 @@ ApplicationWindow {
                     Rectangle {
                         width: parent.width
                         height: parent.height
-                        color: "blue"
+                        color: styleData.value
                     }
                 }
             }
 
             ControlsOld.TableViewColumn {
-                role: "bgColor"
+                role: "Role_BgColor"
                 title: "BG Color"
                 width: 70
 
@@ -188,7 +190,7 @@ ApplicationWindow {
                         id: ttt1
                         width: parent.width
                         height: parent.height
-                        color: "yellow"
+                        color: styleData.value
 
                     }
                     onClicked: {
@@ -199,7 +201,7 @@ ApplicationWindow {
             }
 
             ControlsOld.TableViewColumn {
-                role: "pattern"
+                role: "Role_Pattern"
                 title: "Pattern"
                 width: 400
 
@@ -207,18 +209,30 @@ ApplicationWindow {
                     Rectangle {
                         width: parent.width
                         height: parent.height
-                        color: "white"
-
+                        color: filtersModel.data(filtersModel.index(styleData.row, 0), 258)
                     }
                     Text {
                         anchors.fill: parent
-
                         //        width: parent.width
                         //        wrapMode: Text.WordWrap
-                        text: styleData.value
+                        text:
+                        {
+                            if (filtersModel !== null)
+                            {
+                                var index = filtersModel.index(styleData.row, 0)
+                                var fontColor = filtersModel.data(index, 257)
+                                var bgColor = filtersModel.data(filtersModel.index(styleData.row, 0), 258)
+                                if (fontColor !== null || bgColor !== null)
+                                {
+                                    return "%1 ('%2' on '%3')".arg(styleData.value).arg(fontColor).arg(bgColor)
+                                }
+                            }
+                            return "EMPTY EMPTY!!!"
+                        }
                         font.family: "Inconsolata"
                         //font.pointSize: styleData.selected ? 15 : 10
-                        color: styleData.selected ? "black" : "black"
+                        color: filtersModel.data(filtersModel.index(styleData.row, 0), 257)
+
                     }
                 }
             }
@@ -249,16 +263,18 @@ ApplicationWindow {
                 }
             }
 
-            model: ListModel {
+            /*model: ListModel {
                 ListElement { col1: true; col2: false; col3: 4; pattern: "Test" }
                 ListElement { col1: false; col2: false; col3: true; pattern: "Test2" }
                 ListElement { col1: true; col2: false; col3: true }
-            }
+            } */
 
             rowDelegate: Rectangle
             {
                 height: 100
             }
+
+            model: filtersModel
 
 
             onChecked: console.log(row, col, isChecked);

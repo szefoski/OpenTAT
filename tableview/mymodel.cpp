@@ -32,32 +32,32 @@ QVariant MyModel::data(const QModelIndex &index, int role) const
     }
 
     // Nominal case
-     qDebug() << "MyModel::data: " << index.column() << "; " << index.row();
-    switch(role)
+    qDebug() << "MyModel::data: " << index.column() << "; " << index.row();
+    switch(static_cast<Role>(role))
     {
-        case LogNoRole:
-            return m_the_data[index.row()].m_logNumber;
-        case LogTextRole:
-            return m_the_data[index.row()].m_logText;
-        default:
-            qDebug() << "Not supposed to happen";
-            return QVariant();
+    case Role::LogNumber:
+        return m_the_data[index.row()].m_logNumber;
+    case Role::LogTextRole:
+        return m_the_data[index.row()].m_logText;
+    default:
+        qDebug() << "Not supposed to happen";
+        return QVariant();
     }
 }
 
 bool MyModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-   qDebug() << "setData() called with:" << value;
-   if (!hasIndex(index.row(), index.column(), index.parent()) || !value.isValid())
-            return false;
+    qDebug() << "setData() called with:" << value;
+    if (!hasIndex(index.row(), index.column(), index.parent()) || !value.isValid())
+        return false;
 
-    switch(role)
+    switch(static_cast<Role>(role))
     {
-        case LogNoRole:
-            m_the_data[index.row()].m_logNumber = value.toInt();
+    case Role::LogNumber:
+        m_the_data[index.row()].m_logNumber = value.toInt();
         break;
-        case LogTextRole:
-            m_the_data[index.row()].m_logText = value.toString();
+    case Role::LogTextRole:
+        m_the_data[index.row()].m_logText = value.toString();
         break;
     }
 
@@ -68,15 +68,15 @@ bool MyModel::setData(const QModelIndex &index, const QVariant &value, int role)
 
 QString MyModel::getLongestLog()
 {
-   return m_longestLog;
+    return m_longestLog;
 }
 
 QHash<int, QByteArray> MyModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-        roles[LogNoRole] = "line";
-        roles[LogTextRole] = "text";
-        return roles;
+    roles[static_cast<int>(Role::LogNumber)] = "line";
+    roles[static_cast<int>(Role::LogTextRole)] = "text";
+    return roles;
 
 }
 
