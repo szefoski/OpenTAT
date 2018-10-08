@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 
+#include "filterslistmodel.h"
 #include "filtersmodel.h"
 #include "mymodel.h"
 
@@ -16,6 +17,8 @@ int main(int argc, char *argv[])
 
     FiltersModel filtersModel;
     engine.rootContext()->setContextProperty("filtersModel", &filtersModel);
+
+    qmlRegisterType<FiltersListModel>("FiltersListModel", 1, 0, "FiltersListModel");
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())

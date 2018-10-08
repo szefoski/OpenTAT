@@ -16,7 +16,9 @@ SOURCES += \
         main.cpp \
     sortfilterproxymodel.cpp \
     mymodel.cpp \
-    filtersmodel.cpp
+    filtersmodel.cpp \
+    filterslistmodel.cpp \
+    filterslist.cpp
 
 RESOURCES += qml.qrc
 
@@ -34,4 +36,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     sortfilterproxymodel.h \
     mymodel.h \
-    filtersmodel.h
+    filtersmodel.h \
+    filterslistmodel.h \
+    filterslist.h

@@ -5,6 +5,7 @@ import QtQuick.Controls 1.6 as ControlsOld
 import QtQuick.Layouts 1.3
 import QtQuick.Dialogs 1.3
 import QtQuick.Controls.Styles 1.2
+import FiltersListModel 1.0
 
 //http://doc.qt.io/qt-5/qml-qtquick-item.html#childrenRect.height-prop
 //https://www.qtcentre.org/threads/65419-Custom-editable-TableView
@@ -157,10 +158,11 @@ ApplicationWindow {
                         anchors.centerIn: parent
                         checked: styleData.value
                         onClicked: {
-                            table.selection.clear();
+                            /* table.selection.clear();
                             table.selection.select(styleData.row);
                             table.currentRow = styleData.row;
                             table.checked(styleData.row, styleData.column, checked);
+                            */
                         }
                     }
                 }
@@ -209,7 +211,7 @@ ApplicationWindow {
                     Rectangle {
                         width: parent.width
                         height: parent.height
-                        color: filtersModel.data(filtersModel.index(styleData.row, 0), 258)
+                        color: table.model.data(table.model.index(styleData.row, 0), 258)
                     }
                     Text {
                         anchors.fill: parent
@@ -219,9 +221,9 @@ ApplicationWindow {
                         {
                             if (filtersModel !== null)
                             {
-                                var index = filtersModel.index(styleData.row, 0)
-                                var fontColor = filtersModel.data(index, 257)
-                                var bgColor = filtersModel.data(filtersModel.index(styleData.row, 0), 258)
+                                var index = table.model.index(styleData.row, 0)
+                                var fontColor = table.model.data(index, 257)
+                                var bgColor = table.model.data(table.model.index(styleData.row, 0), 258)
                                 if (fontColor !== null || bgColor !== null)
                                 {
                                     return "%1 ('%2' on '%3')".arg(styleData.value).arg(fontColor).arg(bgColor)
@@ -231,124 +233,36 @@ ApplicationWindow {
                         }
                         font.family: "Inconsolata"
                         //font.pointSize: styleData.selected ? 15 : 10
-                        color: filtersModel.data(filtersModel.index(styleData.row, 0), 257)
+                        color: table.model.data(table.model.index(styleData.row, 0), 257)
 
                     }
                 }
             }
 
             ControlsOld.TableViewColumn {
-                role: "col3"
+                role: "Role_Hits"
                 title: "Columnt3"
 
                 delegate: Item {
-                    SpinBox{
+                    anchors.fill: parent
+                    Text{
+                        anchors.fill: parent
                         id: propValue
-                        value: styleData.value
-                        //minimumValue: 8
-                        //maximumValue: 10
-                        //selectByMouse: false // <- this is not working still editable
-
-                        property int lastValue: 12
-
-                        onValueChanged: {
-                            var newValue = propValue.value + propertyModel.get(propertyTable.currentRow).bonus
-                            var delta = propValue.value - lastValue
-                            secondPage.propValueSum += delta
-                            lastValue = propValue.value
-                            propertyModel.setProperty(propertyTable.currentRow, "value", propValue.value)
-                            propertyModel.setProperty(propertyTable.currentRow, "current", newValue)
-                        }
+                        text: styleData.value
                     }
                 }
             }
-
-            /*model: ListModel {
-                ListElement { col1: true; col2: false; col3: 4; pattern: "Test" }
-                ListElement { col1: false; col2: false; col3: true; pattern: "Test2" }
-                ListElement { col1: true; col2: false; col3: true }
-            } */
 
             rowDelegate: Rectangle
             {
                 height: 100
             }
 
-            model: filtersModel
+            model: FiltersListModel {}
 
 
             onChecked: console.log(row, col, isChecked);
         }
-        /*
-        ListView {
-            id: listView
-            width: 110
-            height: 160
-            clip: true
-            orientation: ListView.Vertical
-            keyNavigationWraps: true
-            Layout.maximumHeight: 100
-            Layout.minimumHeight: 100
-            Layout.preferredHeight: 100
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            model: ListModel {
-                ListElement {
-                    name: "Grey"
-                    colorCode: "grey"
-                }
-
-                ListElement {
-                    name: "Red"
-                    colorCode: "red"
-                }
-
-                ListElement {
-                    name: "Blue"
-                    colorCode: "blue"
-                }
-
-                ListElement {
-                    name: "Green"
-                    colorCode: "green"
-                }
-            }
-            delegate: Item {
-                x: 5
-                width: 80
-                height: 40
-                Row {
-                    id: row1
-                    spacing: 10
-                    Rectangle {
-                        width: 40
-                        height: 40
-                        color: colorCode
-                    }
-
-                    Text {
-                        text: name
-                        font.bold: true
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-                CheckBox {
-                anchors.centerIn: parent
-                checked: styleData.value
-                onClicked: {
-                    table.selection.clear();
-                    table.selection.select(styleData.row);
-                    table.currentRow = styleData.row;
-                    table.checked(styleData.row, styleData.column, checked);
-                }
-            }
-            }
-            ScrollBar.vertical: ScrollBar {
-                policy: ScrollBar.AlwaysOn
-            }
-        }
-
-*/
     }
 
     FileDialog {
